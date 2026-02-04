@@ -1,42 +1,37 @@
+// app/api/gemini/route.ts (ou seu nome)
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export default async function handler(req, res) {
-  export async function POST(req: Request) {
-  console.log("🔍 GEMINI_API_KEY existe?", !!process.env.GEMINI_API_KEY);
-  console.log("🔍 Primeiros 10 chars:", process.env.GEMINI_API_KEY?.slice(0,10) || "Vazia/undefined");
-  }
-
+export async function POST(req: Request) {
+  // LOGS PRIMEIRO - SEMPRE APARECEM
+  console.log("🚀 Iniciando API...");
+  console.log("🔑 GEMINI_API_KEY existe?", !!process.env.GEMINI_API_KEY);
+  console.log("🔑 Primeiros chars:", process.env.GEMINI_API_KEY?.slice(0,20) || "❌ VAZIA");
+  
   try {
-    console.log("1️⃣ API chamada");
-
-    if (req.method !== "POST") {
-      return res.status(405).json({ resposta: "Método não permitido" });
+    if (!process.env.GEMINI_API_KEY) {
+      console.error("❌ API KEY NÃO ENCONTRADA!");
+      return new Response(JSON.stringify({ error: "API Key não configurada" }), { 
+        status: 500, 
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
-
-    const { mensagem } = req.body;
-
-    if (!mensagem) {
-      return res.status(400).json({ resposta: "Mensagem não enviada" });
-    }
-
-    console.log("2️⃣ Mensagem recebida:", mensagem);
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    
+    console.log("✅ Criando Gemini...");
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    console.log("3️⃣ Chamando Gemini");
-
+    
+    console.log("✅ Gerando conteúdo...");
+    const mensagem = await req.text();
+    console.log("Mensagem recebida:", mensagem);
+    
     const result = await model.generateContent(mensagem);
     const resposta = result.response.text();
-
-    console.log("4️⃣ Gemini respondeu");
-
-    return res.status(200).json({ resposta });
-
-  } catch (erro) {
-    console.error("❌ ERRO:", erro);
-    return res.status(500).json({
-      resposta: "❌ Erro ao processar a mensagem."
-    });
+    
+    console.log("✅ Sucesso:", resposta.slice(0,50));
+    return Response.json({ resposta });
+    
+  } catch (error: any) {
+    console.error("💥 ERRO:", error.message);
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
