@@ -1,4 +1,5 @@
-import { interpretarMensagem } from "./gemini.js";
+const comando = await interpretarMensagem(mensagem);
+
 
 const produtos = {
   salgado: 5,
