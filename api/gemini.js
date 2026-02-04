@@ -1,11 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 export async function interpretarMensagem(mensagem) {
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash"
-  });
+  const apiKey = process.env.GEMINI_API_KEY;
 
   const prompt = `
 Retorne APENAS um JSON válido.
@@ -23,12 +17,30 @@ Mensagem:
 "${mensagem}"
 `;
 
-  const result = await model.generateContent(prompt);
-  const texto = result.response.text();
+  const response = await fetch(
+    "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=" + apiKey,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }]
+          }
+        ]
+      })
+    }
+  );
 
-  try {
-    return JSON.parse(texto);
-  } catch {
-    throw new Error("Gemini não retornou JSON válido");
+  const data = await response.json();
+
+  if (!data.candidates || !data.candidates[0]) {
+    throw new Error("Resposta vazia do Gemini");
   }
+
+  const texto = data.candidates[0].content.parts[0].text;
+
+  return JSON.parse(texto);
 }
