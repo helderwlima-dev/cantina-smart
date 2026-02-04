@@ -19,7 +19,13 @@ export default async function handler(req, res) {
   try {
     const { mensagem } = req.body;
 
-    const comando = await interpretarMensagem(mensagem);
+    const comando = {
+  acao: "registrar_venda",
+  aluno: "João",
+  produto: "salgado",
+  valor: null
+};
+
 
     const { acao, aluno, produto, valor } = comando;
 
