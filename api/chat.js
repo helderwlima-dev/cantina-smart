@@ -4,9 +4,7 @@ export default async function handler(req, res) {
   export async function POST(req: Request) {
   console.log("🔍 GEMINI_API_KEY existe?", !!process.env.GEMINI_API_KEY);
   console.log("🔍 Primeiros 10 chars:", process.env.GEMINI_API_KEY?.slice(0,10) || "Vazia/undefined");
-  
-  // resto do seu código...
-}
+  }
 
   try {
     console.log("1️⃣ API chamada");
