@@ -10,9 +10,20 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ resposta: "Método não permitido" });
-  }
+let mensagem = "";
+
+if (req.method === "POST") {
+  mensagem = req.body?.mensagem;
+}
+
+if (req.method === "GET") {
+  mensagem = req.query?.mensagem;
+}
+
+if (!mensagem) {
+  return res.status(400).json({ resposta: "Mensagem não enviada" });
+}
+
 
   try {
     const { mensagem } = req.body;
