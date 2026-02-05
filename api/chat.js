@@ -58,9 +58,19 @@ ${mensagem}
 
     const data = await response.json();
 
-    const resposta =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Não consegui entender a mensagem.";
+   let resposta = "Não consegui entender a mensagem.";
+
+if (
+  data.candidates &&
+  data.candidates[0] &&
+  data.candidates[0].content &&
+  data.candidates[0].content.parts &&
+  data.candidates[0].content.parts[0] &&
+  data.candidates[0].content.parts[0].text
+) {
+  resposta = data.candidates[0].content.parts[0].text;
+}
+
 
     return res.status(200).json({ resposta });
 
