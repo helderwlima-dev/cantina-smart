@@ -56,10 +56,18 @@ Resposta: Maria comprou 1 suco no valor de R$ 5,00.
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const result = await model.generateContent([
-      systemPrompt,
-      `Mensagem do usuário: ${mensagem}`
-    ]);
+   const result = await model.generateContent({
+  contents: [
+    {
+      role: "user",
+      parts: [
+        {
+          text: `${systemPrompt}\n\nMensagem do usuário: ${mensagem}`
+        }
+      ]
+    }
+  ]
+});
 
     const respostaIA = result.response.text();
 
